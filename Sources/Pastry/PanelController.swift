@@ -76,6 +76,7 @@ final class PanelController {
             origin.y = min(max(origin.y, vf.minY + 8), vf.maxY - size.height - 8)
         }
         state.selected = 0
+        state.lastMouse = mouse
         panel.setFrame(NSRect(origin: origin, size: size), display: true)
         panel.makeKeyAndOrderFront(nil)
         panel.invalidateShadow()   // recompute the shadow from the rounded shape

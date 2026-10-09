@@ -2,6 +2,9 @@ import SwiftUI
 
 final class PanelState: ObservableObject {
     @Published var selected = 0
+    /// Last mouse position seen by a hover. Rows sliding under a still cursor
+    /// (keyboard scrolling) fire hovers too; those must not steal the selection.
+    var lastMouse = NSEvent.mouseLocation
 }
 
 struct ClipListView: View {
@@ -45,7 +48,12 @@ struct ClipListView: View {
                                     .id(item.id)
                                     .contentShape(Rectangle())
                                     .onTapGesture { onPick(item) }
-                                    .onHover { inside in if inside { state.selected = index } }
+                                    .onHover { inside in
+                                        let mouse = NSEvent.mouseLocation
+                                        guard inside, mouse != state.lastMouse else { return }
+                                        state.lastMouse = mouse
+                                        state.selected = index
+                                    }
                                     .contextMenu {
                                         Button("Paste") { onPick(item) }
                                         Button("Delete") { store.remove(item) }
